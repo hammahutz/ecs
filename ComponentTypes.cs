@@ -5,12 +5,12 @@ using System.Reflection;
 
 namespace ecs;
 
-public static class SignatureManager
+public static class ComponentTypes
 {
     private static Dictionary<Type, int> _componentTypeIds = new Dictionary<Type, int>();
     private static int _nextBit = 0;
 
-    public static void RegisterComponent(Type type)
+    private static void RegisterComponent(Type type)
     {
         if (!_componentTypeIds.ContainsKey(type))
         {
@@ -45,5 +45,27 @@ public static class SignatureManager
                 $"Could not register component type {typeof(T).Name}."
             );
         }
+    }
+
+    public static int GetComponentBit(Type type)
+    {
+        if (_componentTypeIds.TryGetValue(type, out int bit))
+        {
+            return bit;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Could not register component type {type.Name}.");
+        }
+    }
+
+    public static Signature GetSignature(params Type[] type)
+    {
+        var signature = new Signature();
+        foreach (var t in type)
+        {
+            signature.Toggle(t, true);
+        }
+        return signature;
     }
 }

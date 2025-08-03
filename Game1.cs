@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,7 +10,9 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private EntityHandler _entityHandler;
+    EntityHandler _entityHandler = new EntityHandler();
+
+    ArchetypeManager archetypeManager = new ArchetypeManager();
 
     public Game1()
     {
@@ -23,9 +26,18 @@ public class Game1 : Game
         // TODO: Add your initialization logic here
 
         base.Initialize();
-        SignatureManager.RegisterComponents();
-        Console.WriteLine(SignatureManager.GetComponentBit<Position>());
-        Console.WriteLine(SignatureManager.GetComponentBit<Rotation>());
+        ComponentTypes.RegisterComponents();
+        Console.WriteLine(ComponentTypes.GetComponentBit<Position>());
+        Console.WriteLine(ComponentTypes.GetComponentBit<Rotation>());
+
+        var arche = archetypeManager.Get<Position, Velocity>();
+        var one = arche.AddEntity(_entityHandler);
+        var two = arche.AddEntity(_entityHandler);
+
+        Position onePosition = new Position();
+
+        arche.Component2.X[one.Id] = 100f;
+        arche.Component2.Y[one.Id] = 100f;
     }
 
     protected override void LoadContent()
@@ -44,6 +56,20 @@ public class Game1 : Game
             Exit();
 
         // TODO: Add your update logic here
+        //
+        var arche = archetypeManager.Get<Position, Velocity>();
+
+        foreach (var e in arche.Entities)
+        {
+            arche.Component1.X[e.Id] +=
+                arche.Component2.X[e.Id] * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            arche.Component1.Y[e.Id] +=
+                arche.Component2.Y[e.Id] * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Console.WriteLine(
+                $"Entity {e.Id} Position: {arche.Component1.X[e.Id]}, {arche.Component1.Y[e.Id]}"
+            );
+        }
 
         base.Update(gameTime);
     }
