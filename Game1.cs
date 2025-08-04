@@ -8,6 +8,11 @@ namespace ecs;
 
 public class Game1 : Game
 {
+    SpriteFont _font;
+    int frameCount = 0;
+    double elapsedTime = 0;
+    int fps = 0;
+
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     EntityHandler _entityHandler = new EntityHandler();
@@ -23,44 +28,22 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-
         base.Initialize();
+
         ComponentTypes.RegisterComponents();
-        Console.WriteLine(ComponentTypes.GetComponentBit<Position>());
-        Console.WriteLine(ComponentTypes.GetComponentBit<Rotation>());
 
         var arche = archetypeManager.Query<Position, Velocity>();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < Global.MaxEntities; i++)
         {
             arche.AddEntity(_entityHandler);
         }
-
-        var arche2 = archetypeManager.Query<Position>();
-        for (int i = 0; i < 10; i++)
-        {
-            arche2.AddEntity(_entityHandler);
-        }
-        var one = arche.AddEntity(_entityHandler);
-        var two = arche.AddEntity(_entityHandler);
-
-        for (int i = 0; i < 10; i++)
-        {
-            arche.AddEntity(_entityHandler);
-        }
-
-        Position onePosition = new Position();
-
-        arche.Component2.X[one.Id] = 100f;
-        arche.Component2.Y[one.Id] = 100f;
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        // TODO: use this.Content to load your game content here
+        _font = Content.Load<SpriteFont>("Arial");
     }
 
     protected override void Update(GameTime gameTime)
@@ -76,14 +59,25 @@ public class Game1 : Game
         archetypeManager
             .Query<Position, Velocity>()
             .ForEach(
-                (i, position, velocity) =>
+                (entity, position, velocity) =>
                 {
-                    position.X[i] += velocity.X[i] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    position.Y[i] += velocity.Y[i] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                    Console.WriteLine($"Entity {i} Position: {position.X[i]}, {position.Y[i]}");
+                    position.X[entity] +=
+                        velocity.X[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    position.Y[entity] +=
+                        velocity.Y[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
             );
+
+        double deltaSeconds = gameTime.ElapsedGameTime.TotalSeconds;
+        elapsedTime += deltaSeconds;
+        frameCount++;
+
+        if (elapsedTime >= 1.0)
+        {
+            fps = frameCount;
+            frameCount = 0;
+            elapsedTime -= 1.0;
+        }
 
         base.Update(gameTime);
     }
@@ -92,7 +86,9 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        _spriteBatch.Begin();
+        _spriteBatch.DrawString(_font, $"FPS: {fps}", new Vector2(10, 10), Color.Green);
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
