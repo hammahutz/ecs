@@ -25,12 +25,21 @@ public static class ComponentTypes
 
     public static void RegisterComponents()
     {
-        Assembly
+        var types = Assembly
             .GetExecutingAssembly()
             .GetTypes()
             .Where(t => t.GetCustomAttribute<ComponentAttribute>() != null)
-            .ToList()
-            .ForEach(t => RegisterComponent(t));
+            .ToList();
+
+        foreach (var type in types)
+        {
+            if (!typeof(IComponent).IsAssignableFrom(type))
+                throw new InvalidOperationException(
+                    $"Component type {type.Name} must implement IComponent interface."
+                );
+
+            RegisterComponent(type);
+        }
     }
 
     public static int GetComponentBit<T>()

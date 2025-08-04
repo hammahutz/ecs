@@ -1,12 +1,7 @@
 using ecs;
 
-struct PositionX
-{
-    float X;
-}
-
 [Component]
-struct Position
+struct Position : IComponent
 {
     public Position() { }
 
@@ -15,7 +10,7 @@ struct Position
 }
 
 [Component]
-struct Velocity
+struct Velocity : IComponent
 {
     public Velocity() { }
 
@@ -24,7 +19,7 @@ struct Velocity
 }
 
 [Component]
-struct Acceleration
+struct Acceleration : IComponent
 {
     public Acceleration() { }
 
@@ -33,7 +28,7 @@ struct Acceleration
 }
 
 [Component]
-struct Rotation
+struct Rotation : IComponent
 {
     public Rotation() { }
 
@@ -41,7 +36,7 @@ struct Rotation
 }
 
 [Component]
-struct Scale
+struct Scale : IComponent
 {
     public Scale() { }
 
@@ -49,7 +44,7 @@ struct Scale
 }
 
 [Component]
-struct Colors
+struct Colors : IComponent
 {
     public Colors() { }
 

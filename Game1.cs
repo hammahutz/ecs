@@ -31,8 +31,24 @@ public class Game1 : Game
         Console.WriteLine(ComponentTypes.GetComponentBit<Rotation>());
 
         var arche = archetypeManager.Get<Position, Velocity>();
+
+        for (int i = 0; i < 10; i++)
+        {
+            arche.AddEntity(_entityHandler);
+        }
+
+        var arche2 = archetypeManager.Get<Position>();
+        for (int i = 0; i < 10; i++)
+        {
+            arche2.AddEntity(_entityHandler);
+        }
         var one = arche.AddEntity(_entityHandler);
         var two = arche.AddEntity(_entityHandler);
+
+        for (int i = 0; i < 10; i++)
+        {
+            arche.AddEntity(_entityHandler);
+        }
 
         Position onePosition = new Position();
 
