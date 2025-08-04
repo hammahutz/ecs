@@ -30,14 +30,14 @@ public class Game1 : Game
         Console.WriteLine(ComponentTypes.GetComponentBit<Position>());
         Console.WriteLine(ComponentTypes.GetComponentBit<Rotation>());
 
-        var arche = archetypeManager.Get<Position, Velocity>();
+        var arche = archetypeManager.Query<Position, Velocity>();
 
         for (int i = 0; i < 10; i++)
         {
             arche.AddEntity(_entityHandler);
         }
 
-        var arche2 = archetypeManager.Get<Position>();
+        var arche2 = archetypeManager.Query<Position>();
         for (int i = 0; i < 10; i++)
         {
             arche2.AddEntity(_entityHandler);
@@ -73,19 +73,17 @@ public class Game1 : Game
 
         // TODO: Add your update logic here
         //
-        var arche = archetypeManager.Get<Position, Velocity>();
+        archetypeManager
+            .Query<Position, Velocity>()
+            .ForEach(
+                (i, position, velocity) =>
+                {
+                    position.X[i] += velocity.X[i] * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    position.Y[i] += velocity.Y[i] * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        foreach (var e in arche.Entities)
-        {
-            arche.Component1.X[e.Id] +=
-                arche.Component2.X[e.Id] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            arche.Component1.Y[e.Id] +=
-                arche.Component2.Y[e.Id] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            Console.WriteLine(
-                $"Entity {e.Id} Position: {arche.Component1.X[e.Id]}, {arche.Component1.Y[e.Id]}"
+                    Console.WriteLine($"Entity {i} Position: {position.X[i]}, {position.Y[i]}");
+                }
             );
-        }
 
         base.Update(gameTime);
     }

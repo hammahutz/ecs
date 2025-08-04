@@ -8,8 +8,8 @@ public class ArchetypeManager
     public Dictionary<ulong, Archetype> Archetypes { get; private set; } =
         new Dictionary<ulong, Archetype>();
 
-    public Archetype<T1> Get<T1>()
-        where T1 : struct
+    public Archetype<T1> Query<T1>()
+        where T1 : struct, IComponent
     {
         var mask = new Signature().Toggle<T1>(true).GetBits();
         if (!Archetypes.ContainsKey(mask))
@@ -19,9 +19,9 @@ public class ArchetypeManager
         return (Archetype<T1>)Archetypes[mask];
     }
 
-    public Archetype<T1, T2> Get<T1, T2>()
-        where T1 : struct
-        where T2 : struct
+    public Archetype<T1, T2> Query<T1, T2>()
+        where T1 : struct, IComponent
+        where T2 : struct, IComponent
     {
         var mask = new Signature().Toggle<T1>(true).Toggle<T2>(true).GetBits();
         if (!Archetypes.ContainsKey(mask))
@@ -31,10 +31,10 @@ public class ArchetypeManager
         return (Archetype<T1, T2>)Archetypes[mask];
     }
 
-    public Archetype<T1, T2, T3> Get<T1, T2, T3>()
-        where T1 : struct
-        where T2 : struct
-        where T3 : struct
+    public Archetype<T1, T2, T3> Query<T1, T2, T3>()
+        where T1 : struct, IComponent
+        where T2 : struct, IComponent
+        where T3 : struct, IComponent
     {
         var mask = new Signature().Toggle<T1>(true).Toggle<T2>(true).Toggle<T3>(true).GetBits();
         if (!Archetypes.ContainsKey(mask))
@@ -44,11 +44,11 @@ public class ArchetypeManager
         return (Archetype<T1, T2, T3>)Archetypes[mask];
     }
 
-    public Archetype<T1, T2, T3, T4> Get<T1, T2, T3, T4>()
-        where T1 : struct
-        where T2 : struct
-        where T3 : struct
-        where T4 : struct
+    public Archetype<T1, T2, T3, T4> Query<T1, T2, T3, T4>()
+        where T1 : struct, IComponent
+        where T2 : struct, IComponent
+        where T3 : struct, IComponent
+        where T4 : struct, IComponent
     {
         var mask = new Signature()
             .Toggle<T1>(true)
