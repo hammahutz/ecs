@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework.Graphics;
+
 namespace ecs;
 
 [Component]
@@ -52,4 +54,12 @@ struct Colors : IComponent
     public float[] G { get; } = new float[Global.MaxEntities];
     public float[] B { get; } = new float[Global.MaxEntities];
     public float[] A { get; } = new float[Global.MaxEntities];
+}
+
+[Component]
+struct Sprite : IComponent
+{
+    public Sprite() { }
+
+    public Texture2D[] Texture { get; set; } = new Texture2D[Global.MaxEntities];
 }

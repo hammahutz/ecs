@@ -1,5 +1,6 @@
 ﻿using System;
 using ecs;
+using ecs.Debug;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -28,25 +29,11 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        base.Initialize();
-
         ComponentTypes.RegisterComponents();
 
-        archetypeManager.Create<Position, Velocity, Acceleration>(
-            _entityHandler,
-            Global.MaxEntities
-        );
+        archetypeManager.Create<Position, Velocity, Sprite>(_entityHandler, Global.MaxEntities);
 
-        archetypeManager.QueryOnly<Position>(
-            (entity, position) =>
-            {
-                Console.WriteLine(
-                    $"entity: {entity}, position: ({position.X[entity]}, {position.Y[entity]})"
-                );
-            }
-        );
-
-        archetypeManager.QueryOnly<Position, Velocity>(
+        archetypeManager.QueryWith<Position, Velocity>(
             (entity, position, velocity) =>
             {
                 position.X[entity] = Random.Shared.Next(0, 800);
@@ -55,12 +42,20 @@ public class Game1 : Game
                 velocity.Y[entity] = Random.Shared.Next(-100, 100);
             }
         );
+
+        base.Initialize();
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _font = Content.Load<SpriteFont>("Arial");
+        archetypeManager.QueryWith<Sprite>(
+            (entity, sprite) =>
+            {
+                sprite.Texture[entity] = Content.Load<Texture2D>("pip");
+            }
+        );
     }
 
     protected override void Update(GameTime gameTime)
@@ -71,29 +66,17 @@ public class Game1 : Game
         )
             Exit();
 
-        archetypeManager.QueryOnly<Position, Velocity>(
+        archetypeManager.QueryWith<Position, Velocity>(
             (entity, position, velocity) =>
             {
                 position.X[entity] +=
                     velocity.X[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 position.Y[entity] +=
                     velocity.Y[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                // Console.WriteLine(
-                //     $"entity: {entity}, position: ({position.X[entity]}, {position.Y[entity]})"
-                // );
             }
         );
 
-        double deltaSeconds = gameTime.ElapsedGameTime.TotalSeconds;
-        elapsedTime += deltaSeconds;
-        frameCount++;
-
-        if (elapsedTime >= 1.0)
-        {
-            fps = frameCount;
-            frameCount = 0;
-            elapsedTime -= 1.0;
-        }
+        Stats.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -103,7 +86,19 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         _spriteBatch.Begin();
-        _spriteBatch.DrawString(_font, $"FPS: {fps}", new Vector2(10, 10), Color.Green);
+
+        archetypeManager.QueryWith<Position, Sprite>(
+            (entity, position, sprite) =>
+            {
+                _spriteBatch.Draw(
+                    sprite.Texture[entity],
+                    new Vector2(position.X[entity], position.Y[entity]),
+                    Color.White
+                );
+            }
+        );
+
+        Stats.Draw(_spriteBatch, _font);
         _spriteBatch.End();
 
         base.Draw(gameTime);

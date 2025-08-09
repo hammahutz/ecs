@@ -6,10 +6,10 @@ namespace ecs;
 
 public class EntityHandler
 {
-    const int MaxEntities = 5000;
     private Queue<int> _availableId;
 
-    public EntityHandler() => _availableId = new Queue<int>(Enumerable.Range(0, MaxEntities));
+    public EntityHandler() =>
+        _availableId = new Queue<int>(Enumerable.Range(0, Global.MaxEntities));
 
     public Entity FetchEntity()
     {
