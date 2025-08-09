@@ -32,7 +32,10 @@ public class Game1 : Game
 
         ComponentTypes.RegisterComponents();
 
-        archetypeManager.Create<Position, Velocity, Acceleration>(_entityHandler, 10);
+        archetypeManager.Create<Position, Velocity, Acceleration>(
+            _entityHandler,
+            Global.MaxEntities
+        );
 
         archetypeManager.QueryOnly<Position>(
             (entity, position) =>
