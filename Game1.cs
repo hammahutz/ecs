@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
+using ecs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
-namespace ecs;
 
 public class Game1 : Game
 {

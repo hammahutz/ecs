@@ -1,4 +1,4 @@
-using ecs;
+namespace ecs;
 
 [Component]
 struct Position : IComponent

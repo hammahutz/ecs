@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using ecs;
+
+namespace ecs;
 
 public abstract class Archetype
 {
