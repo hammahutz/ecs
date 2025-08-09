@@ -11,6 +11,8 @@ public class Game1 : Game
     double elapsedTime = 0;
     int fps = 0;
 
+    string output = string.Empty;
+
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     EntityHandler _entityHandler = new EntityHandler();
@@ -30,24 +32,26 @@ public class Game1 : Game
 
         ComponentTypes.RegisterComponents();
 
-        var arche = archetypeManager.Query<Position, Velocity>();
+        archetypeManager.Create<Position, Velocity, Acceleration>(_entityHandler, 10);
 
-        for (int i = 0; i < Global.MaxEntities; i++)
-        {
-            arche.AddEntity(_entityHandler);
-        }
+        archetypeManager.QueryOnly<Position>(
+            (entity, position) =>
+            {
+                Console.WriteLine(
+                    $"entity: {entity}, position: ({position.X[entity]}, {position.Y[entity]})"
+                );
+            }
+        );
 
-        archetypeManager
-            .Query<Position, Velocity>()
-            .ForEach(
-                (entity, position, velocity) =>
-                {
-                    position.X[entity] = Random.Shared.Next(0, 800);
-                    position.Y[entity] = Random.Shared.Next(0, 600);
-                    velocity.X[entity] = Random.Shared.Next(-100, 100);
-                    velocity.Y[entity] = Random.Shared.Next(-100, 100);
-                }
-            );
+        archetypeManager.QueryOnly<Position, Velocity>(
+            (entity, position, velocity) =>
+            {
+                position.X[entity] = Random.Shared.Next(0, 800);
+                position.Y[entity] = Random.Shared.Next(0, 600);
+                velocity.X[entity] = Random.Shared.Next(-100, 100);
+                velocity.Y[entity] = Random.Shared.Next(-100, 100);
+            }
+        );
     }
 
     protected override void LoadContent()
@@ -64,17 +68,18 @@ public class Game1 : Game
         )
             Exit();
 
-        archetypeManager
-            .Query<Position, Velocity>()
-            .ForEach(
-                (entity, position, velocity) =>
-                {
-                    position.X[entity] +=
-                        velocity.X[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    position.Y[entity] +=
-                        velocity.Y[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                }
-            );
+        archetypeManager.QueryOnly<Position, Velocity>(
+            (entity, position, velocity) =>
+            {
+                position.X[entity] +=
+                    velocity.X[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                position.Y[entity] +=
+                    velocity.Y[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                // Console.WriteLine(
+                //     $"entity: {entity}, position: ({position.X[entity]}, {position.Y[entity]})"
+                // );
+            }
+        );
 
         double deltaSeconds = gameTime.ElapsedGameTime.TotalSeconds;
         elapsedTime += deltaSeconds;

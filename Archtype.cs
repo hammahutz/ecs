@@ -15,11 +15,14 @@ public abstract class Archetype
         return entity;
     }
 
+    public abstract IComponent GetComponent<T>()
+        where T : struct, IComponent;
+
     public override string ToString() => $"Archetype with signature: {Signature}";
 }
 
 public class Archetype<T1> : Archetype
-    where T1 : struct
+    where T1 : struct, IComponent
 {
     public T1 Component1 = new T1();
 
@@ -27,11 +30,25 @@ public class Archetype<T1> : Archetype
 
     public void ForEach(Action<int, T1> action) =>
         Entities.ForEach(entity => action(entity.Id, Component1));
+
+    public override IComponent GetComponent<T>()
+    {
+        if (typeof(T) == typeof(T1))
+        {
+            return Component1;
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"Component {typeof(T).Name} not found in Archetype."
+            );
+        }
+    }
 }
 
 public class Archetype<T1, T2> : Archetype
-    where T1 : struct
-    where T2 : struct
+    where T1 : struct, IComponent
+    where T2 : struct, IComponent
 {
     public T1 Component1 = new T1();
     public T2 Component2 = new T2();
@@ -40,12 +57,30 @@ public class Archetype<T1, T2> : Archetype
 
     public void ForEach(Action<int, T1, T2> action) =>
         Entities.ForEach(entity => action(entity.Id, Component1, Component2));
+
+    public override IComponent GetComponent<T>()
+    {
+        if (typeof(T) == typeof(T1))
+        {
+            return Component1;
+        }
+        else if (typeof(T) == typeof(T2))
+        {
+            return Component2;
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"Component {typeof(T).Name} not found in Archetype."
+            );
+        }
+    }
 }
 
 public class Archetype<T1, T2, T3> : Archetype
-    where T1 : struct
-    where T2 : struct
-    where T3 : struct
+    where T1 : struct, IComponent
+    where T2 : struct, IComponent
+    where T3 : struct, IComponent
 {
     public T1 Component1 = new T1();
     public T2 Component2 = new T2();
@@ -56,13 +91,35 @@ public class Archetype<T1, T2, T3> : Archetype
 
     public void ForEach(Action<int, T1, T2, T3> action) =>
         Entities.ForEach(entity => action(entity.Id, Component1, Component2, Component3));
+
+    public override IComponent GetComponent<T>()
+    {
+        if (typeof(T) == typeof(T1))
+        {
+            return Component1;
+        }
+        else if (typeof(T) == typeof(T2))
+        {
+            return Component2;
+        }
+        else if (typeof(T) == typeof(T3))
+        {
+            return Component3;
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"Component {typeof(T).Name} not found in Archetype."
+            );
+        }
+    }
 }
 
 public class Archetype<T1, T2, T3, T4> : Archetype
-    where T1 : struct
-    where T2 : struct
-    where T3 : struct
-    where T4 : struct
+    where T1 : struct, IComponent
+    where T2 : struct, IComponent
+    where T3 : struct, IComponent
+    where T4 : struct, IComponent
 {
     public T1 Component1 = new();
     public T2 Component2 = new();
@@ -76,4 +133,20 @@ public class Archetype<T1, T2, T3, T4> : Archetype
         Entities.ForEach(entity =>
             action(entity.Id, Component1, Component2, Component3, Component4)
         );
+
+    public override IComponent GetComponent<T>()
+    {
+        if (typeof(T) == typeof(T1))
+            return Component1;
+        else if (typeof(T) == typeof(T2))
+            return Component2;
+        else if (typeof(T) == typeof(T3))
+            return Component3;
+        else if (typeof(T) == typeof(T4))
+            return Component4;
+        else
+            throw new InvalidOperationException(
+                $"Component {typeof(T).Name} not found in Archetype."
+            );
+    }
 }
