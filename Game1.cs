@@ -38,6 +38,18 @@ public class Game1 : Game
         {
             arche.AddEntity(_entityHandler);
         }
+
+        archetypeManager
+            .Query<Position, Velocity>()
+            .ForEach(
+                (entity, position, velocity) =>
+                {
+                    position.X[entity] = Random.Shared.Next(0, 800);
+                    position.Y[entity] = Random.Shared.Next(0, 600);
+                    velocity.X[entity] = Random.Shared.Next(-100, 100);
+                    velocity.Y[entity] = Random.Shared.Next(-100, 100);
+                }
+            );
     }
 
     protected override void LoadContent()
@@ -54,8 +66,6 @@ public class Game1 : Game
         )
             Exit();
 
-        // TODO: Add your update logic here
-        //
         archetypeManager
             .Query<Position, Velocity>()
             .ForEach(

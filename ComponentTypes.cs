@@ -42,19 +42,31 @@ public static class ComponentTypes
         }
     }
 
-    public static int GetComponentBit<T>()
+    public static int GetComponentBit<T1>()
     {
-        if (_componentTypeIds.TryGetValue(typeof(T), out int bit))
+        if (_componentTypeIds.TryGetValue(typeof(T1), out int bit))
         {
             return bit;
         }
         else
         {
             throw new InvalidOperationException(
-                $"Could not register component type {typeof(T).Name}."
+                $"Could not register component type {typeof(T1).Name}."
             );
         }
     }
+
+    public static int GetComponentBit<T1, T2>() =>
+        GetComponentBit(typeof(T1)) | GetComponentBit(typeof(T2));
+
+    public static int GetComponentBit<T1, T2, T3>() =>
+        GetComponentBit(typeof(T1)) | GetComponentBit(typeof(T2)) | GetComponentBit(typeof(T3));
+
+    public static int GetComponentBit<T1, T2, T3, T4>() =>
+        GetComponentBit(typeof(T1))
+        | GetComponentBit(typeof(T2))
+        | GetComponentBit(typeof(T3))
+        | GetComponentBit(typeof(T4));
 
     public static int GetComponentBit(Type type)
     {
