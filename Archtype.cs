@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ecs;
 
@@ -28,8 +29,11 @@ public class Archetype<T1> : Archetype
 
     public override Signature Signature => new Signature().Toggle<T1>(true);
 
-    public void ForEach(Action<int, T1> action) =>
+    public void ForEachSingel(Action<int, T1> action) =>
         Entities.ForEach(entity => action(entity.Id, Component1));
+
+    public void ForEach(Action<int, T1> action) =>
+        Parallel.ForEach(Entities, entitty => action(entitty.Id, Component1));
 
     public override IComponent GetComponent<T>()
     {
@@ -56,7 +60,7 @@ public class Archetype<T1, T2> : Archetype
     public override Signature Signature => new Signature().Toggle<T1>(true).Toggle<T2>(true);
 
     public void ForEach(Action<int, T1, T2> action) =>
-        Entities.ForEach(entity => action(entity.Id, Component1, Component2));
+        Parallel.ForEach(Entities, entity => action(entity.Id, Component1, Component2));
 
     public override IComponent GetComponent<T>()
     {
@@ -90,7 +94,7 @@ public class Archetype<T1, T2, T3> : Archetype
         new Signature().Toggle<T1>(true).Toggle<T2>(true).Toggle<T3>(true);
 
     public void ForEach(Action<int, T1, T2, T3> action) =>
-        Entities.ForEach(entity => action(entity.Id, Component1, Component2, Component3));
+        Parallel.ForEach(Entities, entity => action(entity.Id, Component1, Component2, Component3));
 
     public override IComponent GetComponent<T>()
     {
@@ -130,8 +134,9 @@ public class Archetype<T1, T2, T3, T4> : Archetype
         new Signature().Toggle<T1>(true).Toggle<T2>(true).Toggle<T3>(true).Toggle<T4>(true);
 
     public void ForEach(Action<int, T1, T2, T3, T4> action) =>
-        Entities.ForEach(entity =>
-            action(entity.Id, Component1, Component2, Component3, Component4)
+        Parallel.ForEach(
+            Entities,
+            entity => action(entity.Id, Component1, Component2, Component3, Component4)
         );
 
     public override IComponent GetComponent<T>()

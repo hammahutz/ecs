@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using ecs;
 using ecs.Debug;
 using Microsoft.Xna.Framework;
@@ -7,17 +8,14 @@ using Microsoft.Xna.Framework.Input;
 
 public class Game1 : Game
 {
-    SpriteFont _font;
-    int frameCount = 0;
-    double elapsedTime = 0;
-    int fps = 0;
-
     string output = string.Empty;
 
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    EntityHandler _entityHandler = new EntityHandler();
 
+    private SpriteFont _font;
+
+    EntityHandler _entityHandler = new EntityHandler();
     ArchetypeManager archetypeManager = new ArchetypeManager();
 
     public Game1()
@@ -50,7 +48,7 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _font = Content.Load<SpriteFont>("Arial");
-        archetypeManager.QueryWith<Sprite>(
+        archetypeManager.QueryWithSingelThreaded<Sprite>(
             (entity, sprite) =>
             {
                 sprite.Texture[entity] = Content.Load<Texture2D>("pip");
@@ -66,7 +64,7 @@ public class Game1 : Game
         )
             Exit();
 
-        archetypeManager.QueryWith<Position, Velocity>(
+        archetypeManager.QueryWithSingelThreaded<Position, Velocity>(
             (entity, position, velocity) =>
             {
                 position.X[entity] +=
@@ -87,16 +85,16 @@ public class Game1 : Game
 
         _spriteBatch.Begin();
 
-        archetypeManager.QueryWith<Position, Sprite>(
-            (entity, position, sprite) =>
-            {
-                _spriteBatch.Draw(
-                    sprite.Texture[entity],
-                    new Vector2(position.X[entity], position.Y[entity]),
-                    Color.White
-                );
-            }
-        );
+        // archetypeManager.QueryWithSingelThreaded<Position, Sprite>(
+        //     (entity, position, sprite) =>
+        //     {
+        //         _spriteBatch.Draw(
+        //             sprite.Texture[entity],
+        //             new Vector2(position.X[entity], position.Y[entity]),
+        //             Color.White
+        //         );
+        //     }
+        // );
 
         Stats.Draw(_spriteBatch, _font);
         _spriteBatch.End();

@@ -67,8 +67,10 @@ public static class Stats
             $"FPS: {FPS:F2}\n"
             + $"Average FPS: {AverageFPS:F2}\n"
             + $"Is Running Slow: {IsRunningSlow}\n"
-            + $"Nb Update Called: {NbUpdateCalled}\n"
-            + $"Nb Draw Called: {NbDrawCalled}";
+            + $"Update Called: {NbUpdateCalled}\n"
+            + $"Draw Called: {NbDrawCalled}\n"
+            + $"Diff: {NbUpdateCalled - NbDrawCalled}\n"
+            + $"Entities: {Global.MaxEntities.ToString("N0", new System.Globalization.CultureInfo("sv-SE")).Replace('\u00A0', ' ')}";
     }
 
     public static void Draw(SpriteBatch spriteBatch, SpriteFont font)
