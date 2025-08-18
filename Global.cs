@@ -1,4 +1,4 @@
 public static class Global
 {
-    public const int MaxEntities = 500_000;
+    public const int MaxEntities = 150_000;
 }

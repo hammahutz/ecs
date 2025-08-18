@@ -126,6 +126,21 @@ public class ArchetypeManager
         ((Archetype<T1, T2, T3>)Archetypes[mask]).ForEach(action);
     }
 
+    public void QueryOnlySingle<T1, T2, T3>(Action<int, T1, T2, T3> action)
+        where T1 : struct, IComponent
+        where T2 : struct, IComponent
+        where T3 : struct, IComponent
+    {
+        var mask = new Signature().Toggle<T1>(true).Toggle<T2>(true).Toggle<T3>(true).GetBits();
+
+        if (!Archetypes.ContainsKey(mask))
+        {
+            Archetypes[mask] = new Archetype<T1, T2, T3>();
+        }
+
+        ((Archetype<T1, T2, T3>)Archetypes[mask]).ForEachSingel(action);
+    }
+
     public void QueryOnly<T1, T2, T3, T4>(Action<int, T1, T2, T3, T4> action)
         where T1 : struct, IComponent
         where T2 : struct, IComponent
@@ -180,11 +195,11 @@ public class ArchetypeManager
         {
             if ((archetype.Key & mask) == mask)
             {
-                var component = archetype.Value.GetComponent<T1>();
+                var component = (T1)archetype.Value.GetComponent<T1>();
 
                 foreach (var entity in archetype.Value.Entities)
                 {
-                    action(entity.Id, (T1)component);
+                    action(entity.Id, component);
                 }
             }
         }
@@ -198,24 +213,21 @@ public class ArchetypeManager
         var batch = new List<(int id, T1 t1, T2 t2)>();
         foreach (var keyValue in Archetypes)
         {
-            if ((keyValue.Key & mask) == mask)
+            if ((keyValue.Key & mask) != mask)
             {
-                var component1 = keyValue.Value.GetComponent<T1>();
-                var component2 = keyValue.Value.GetComponent<T2>();
+                continue;
+            }
+            var component1 = (T1)keyValue.Value.GetComponent<T1>();
+            var component2 = (T2)keyValue.Value.GetComponent<T2>();
 
-                foreach (var entity in keyValue.Value.Entities)
+            Parallel.ForEach(
+                keyValue.Value.Entities,
+                entity =>
                 {
-                    batch.Add((entity.Id, (T1)component1, (T2)component2));
+                    action(entity.Id, component1, component2);
                 }
-            }
+            );
         }
-        Parallel.ForEach(
-            batch,
-            item =>
-            {
-                action(item.id, item.t1, item.t2);
-            }
-        );
     }
 
     public void QueryWithSingelThreaded<T1, T2>(Action<int, T1, T2> action)
@@ -227,8 +239,8 @@ public class ArchetypeManager
         {
             if ((archetype.Key & mask) == mask)
             {
-                var component1 = archetype.Value.GetComponent<T1>();
-                var component2 = archetype.Value.GetComponent<T2>();
+                var component1 = (T1)archetype.Value.GetComponent<T1>();
+                var component2 = (T2)archetype.Value.GetComponent<T2>();
 
                 foreach (var entity in archetype.Value.Entities)
                 {

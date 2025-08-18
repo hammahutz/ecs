@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ecs;
@@ -9,17 +10,34 @@ public abstract class Archetype
     public List<Entity> Entities { get; private set; } = new List<Entity>();
     public abstract Signature Signature { get; }
 
-    public Entity AddEntity(EntityHandler entityHandler)
+    public void AddEntities(EntityHandler entityHandler, int capacity = 1)
     {
-        var entity = entityHandler.FetchEntity();
-        Entities.Add(entity);
-        return entity;
+        for (int i = 0; i < capacity; i++)
+        {
+            var entity = entityHandler.FetchEntity();
+            Entities.Add(entity);
+        }
     }
 
     public abstract IComponent GetComponent<T>()
         where T : struct, IComponent;
 
     public override string ToString() => $"Archetype with signature: {Signature}";
+}
+
+public class ArchetypePos : Archetype
+{
+    public Position Position { get; set; } = new Position();
+
+    public override Signature Signature => new Signature().Toggle<Position>(true);
+
+    public override IComponent GetComponent<T>()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ForEach(Action<float, float> action) =>
+        Parallel.ForEach(Entities, entity => action(Position.X[entity.Id], Position.Y[entity.Id]));
 }
 
 public class Archetype<T1> : Archetype
@@ -95,6 +113,9 @@ public class Archetype<T1, T2, T3> : Archetype
 
     public void ForEach(Action<int, T1, T2, T3> action) =>
         Parallel.ForEach(Entities, entity => action(entity.Id, Component1, Component2, Component3));
+
+    public void ForEachSingel(Action<int, T1, T2, T3> action) =>
+        Entities.ForEach(entity => action(entity.Id, Component1, Component2, Component3));
 
     public override IComponent GetComponent<T>()
     {

@@ -64,8 +64,8 @@ public class Game1 : Game
         )
             Exit();
 
-        archetypeManager.QueryWithSingelThreaded<Position, Velocity>(
-            (entity, position, velocity) =>
+        archetypeManager.QueryOnly<Position, Velocity, Sprite>(
+            (entity, position, velocity, Sprite) =>
             {
                 position.X[entity] +=
                     velocity.X[entity] * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -85,16 +85,16 @@ public class Game1 : Game
 
         _spriteBatch.Begin();
 
-        // archetypeManager.QueryWithSingelThreaded<Position, Sprite>(
-        //     (entity, position, sprite) =>
-        //     {
-        //         _spriteBatch.Draw(
-        //             sprite.Texture[entity],
-        //             new Vector2(position.X[entity], position.Y[entity]),
-        //             Color.White
-        //         );
-        //     }
-        // );
+        archetypeManager.QueryWithSingelThreaded<Position, Sprite>(
+            (entity, position, sprite) =>
+            {
+                _spriteBatch.Draw(
+                    sprite.Texture[entity],
+                    new Vector2(position.X[entity], position.Y[entity]),
+                    Color.White
+                );
+            }
+        );
 
         Stats.Draw(_spriteBatch, _font);
         _spriteBatch.End();

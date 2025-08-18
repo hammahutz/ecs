@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace ecs;
 
 [Component]
-struct Position : IComponent
+public struct Position : IComponent
 {
     public Position() { }
 
